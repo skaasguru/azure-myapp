@@ -15,3 +15,13 @@ The broader flow is given below.
 * Deploying a monolith app on a single VM and discussing its limitations on performance, scaling, etc.
 * Splitting the monolith to a set of microservices to separate the responsibilities. Deploying each service on a docker container.
 
+## Installation
+```bash
+sudo su
+
+wget https://raw.githubusercontent.com/skaasguru/azure-myapp/v1.0/deploy.sh
+
+chmod +x deploy.sh
+
+./deploy.sh
+```
