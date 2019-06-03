@@ -74,7 +74,7 @@
 			<div class="col-md-3">
 				<div class="thumbnail thumbnail-height">
 					<a href="galleryservlet/<%= blob.name() %>">
-						<img class="img-rounded" src="galleryservlet/<%= blob.name() %>" alt="Image">
+						<img class="img-rounded" src="<%= AppConfig.getSAS(blob.name()) %>" alt="Image">
 					</a>
 					<a class="top-right" href="galleryservlet/<%= blob.name() %>?delete">
 						<span class="glyphicon glyphicon-trash"></span>
