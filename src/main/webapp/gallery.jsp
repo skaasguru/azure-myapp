@@ -9,9 +9,8 @@
 	com.microsoft.azure.storage.blob.models.ContainerListBlobFlatSegmentResponse
 " %>
 
-
 <%
-	String user_id = (String)session.getAttribute("id");
+	String user_id = AppConfig.getUserId(request.getCookies());
 	Boolean isLoggedIn = (user_id != null);  
 	if ( !isLoggedIn ){
 		response.sendRedirect("index.jsp");

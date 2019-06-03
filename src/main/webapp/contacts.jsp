@@ -2,7 +2,7 @@
 <%@ page import="java.sql.*,com.skaas.core.*" %>
 
 <%
-	String user_id = (String)session.getAttribute("id");
+	String user_id = AppConfig.getUserId(request.getCookies());
 	Boolean isLoggedIn = (user_id != null);
 	if ( !isLoggedIn ){
 		response.sendRedirect("index.jsp");

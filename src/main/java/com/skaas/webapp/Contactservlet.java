@@ -8,8 +8,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
+import com.skaas.core.AppConfig;
 import com.skaas.core.MySQLConnector;
 
 /**
@@ -30,9 +30,8 @@ public class Contactservlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		PrintWriter out = response.getWriter();
-		HttpSession session=request.getSession(false);  
-		if(session != null && session.getAttribute("id") != null){
-			String user_id = (String) session.getAttribute("id");
+		String user_id = AppConfig.getUserId(request.getCookies()); 
+		if(user_id != null){
 			
 			if (request.getParameter("delete") != null) {
 				
@@ -60,11 +59,8 @@ public class Contactservlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		PrintWriter out = response.getWriter();
-		HttpSession session=request.getSession(false);
-		
-		if(session != null && session.getAttribute("id") != null){  
-			String user_id = (String) session.getAttribute("id");
-			
+		String user_id = AppConfig.getUserId(request.getCookies()); 
+		if(user_id != null){ 
 			if (request.getParameter("name") != null && request.getParameter("phone") != null) {
 				String query = "INSERT INTO contacts (`user_id`, `name`, `phone`) VALUES ('"+user_id+"', '"+ request.getParameter("name") +"', '"+request.getParameter("phone")+"');";
 				try {

@@ -14,7 +14,6 @@ import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
 import com.microsoft.azure.storage.blob.BlockBlobURL;
@@ -45,8 +44,8 @@ public class Galleryservlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		HttpSession session=request.getSession(false);  
-		if(session != null && session.getAttribute("id") != null){  
+		String user_id = AppConfig.getUserId(request.getCookies()); 
+		if(user_id != null){  
 	        String objectName = URLDecoder.decode(request.getPathInfo(), "UTF-8").substring(1);
 	        
 			if (request.getParameterMap().containsKey("delete")) {
@@ -92,10 +91,8 @@ public class Galleryservlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		HttpSession session = request.getSession(false);  
-		if(session != null && session.getAttribute("id") != null){
-			String user_id = (String)session.getAttribute("id");
-	    	
+		String user_id = AppConfig.getUserId(request.getCookies());  
+		if(user_id != null){	    	
 			Part filePart = request.getPart("file");
 	    	String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
 	        byte[] fileBytes = toByteArray(filePart.getInputStream());

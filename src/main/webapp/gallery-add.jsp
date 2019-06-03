@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8" %>
-
+<%@ page import="com.skaas.core.AppConfig" %>
 <%
-	String user_id = (String)session.getAttribute("id");
+	String user_id = AppConfig.getUserId(request.getCookies());
 	Boolean isLoggedIn = (user_id != null);  
 	if ( !isLoggedIn ){
 		response.sendRedirect("index.jsp");

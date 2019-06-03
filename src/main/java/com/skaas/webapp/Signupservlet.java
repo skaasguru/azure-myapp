@@ -5,10 +5,10 @@ import java.io.PrintWriter;
 import java.security.InvalidKeyException;
 import java.sql.SQLException;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import com.skaas.core.AppConfig;
 import com.skaas.core.MySQLConnector;
@@ -35,11 +35,8 @@ public class Signupservlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		HttpSession session=request.getSession(false);
-		System.out.println((session != null) + "--" + (session.getAttribute("id") != null));
-		if(session != null && session.getAttribute("id") != null){  
-	    	String user_id = (String)session.getAttribute("id");
-	    	
+		String user_id = AppConfig.getUserId(request.getCookies());
+		if(user_id != null){  
 	    	String query1 = "DELETE FROM contacts WHERE `user_id`=" + user_id + ";";
 	    	String query2 = "DELETE FROM users WHERE `id`=" + user_id + ";";
 			try {
@@ -64,7 +61,9 @@ public class Signupservlet extends HttpServlet {
 			} catch (InvalidKeyException e) {
 				e.printStackTrace();
 			}
-		    session.invalidate();
+			Cookie cookie = new Cookie("token", null);
+        	cookie.setMaxAge(0); 
+        	response.addCookie(cookie);
 			response.sendRedirect("index.jsp");
 		} else {
 			PrintWriter out = response.getWriter();
