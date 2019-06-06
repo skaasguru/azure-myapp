@@ -18,7 +18,7 @@ public class AppConfig {
 			container = (System.getenv("SA_CONTAINER") != null) ? System.getenv("SA_CONTAINER") : "uploadedfiles",
 			dbString = (System.getenv("DB_STRING") != null) ? System.getenv("DB_STRING") : "jdbc:mysql://localhost:3306/myapp",
 			dbUsername = (System.getenv("DB_USERNAME") != null) ? System.getenv("DB_USERNAME") : "root",
-			dbPassword = (System.getenv("DB_PASSWORD") != null) ? System.getenv("DB_PASSWORD") : "";
+			dbPassword = (System.getenv("DB_PASSWORD") != null) ? System.getenv("DB_PASSWORD") : "password";
 	
 			
 	public static ContainerURL getContainerURL() throws InvalidKeyException, MalformedURLException {
