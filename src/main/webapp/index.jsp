@@ -4,6 +4,8 @@
 	com.skaas.core.*,
 	java.util.List,
 	java.lang.Math,
+	com.datastax.driver.core.Row,
+	
 	com.microsoft.azure.storage.blob.BlobURL,
 	com.microsoft.azure.storage.blob.ContainerURL,
 	com.microsoft.azure.storage.blob.ListBlobsOptions,
@@ -65,12 +67,12 @@
 					</div>
 					<div class="panel-body text-center">
 						<%
-						   	MySQLConnector mysql =	new MySQLConnector();
-					   		ResultSet resultset = mysql.executeQuery("SELECT COUNT(*) from contacts WHERE user_id="+user_id);
-						   	if(resultset.next()){
-								 out.println("<p>You have <b>" + resultset.getString(1) + "</b> contacts in your account.</p>");
-							}
-						   	mysql.close(resultset);
+						String query = "SELECT COUNT(*) from contacts WHERE user_id=" + user_id;
+
+						CassandraConnector cassandra = new CassandraConnector();
+						Long contactsCount = cassandra.execute(query).all().get(0).getLong("count");
+						out.println("<p>You have <b>" + contactsCount + "</b> contacts in your account.</p>");
+				        cassandra.close();
 					   	%>
 					   	<br>
 					   	<br>

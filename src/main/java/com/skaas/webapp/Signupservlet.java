@@ -2,21 +2,25 @@ package com.skaas.webapp;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+
 import java.security.InvalidKeyException;
-import java.sql.SQLException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.skaas.core.AppConfig;
-import com.skaas.core.MySQLConnector;
 import com.microsoft.azure.storage.blob.BlobURL;
 import com.microsoft.azure.storage.blob.ContainerURL;
 import com.microsoft.azure.storage.blob.ListBlobsOptions;
 import com.microsoft.azure.storage.blob.models.BlobItem;
 import com.microsoft.azure.storage.blob.models.ContainerListBlobFlatSegmentResponse;
+
+import com.skaas.core.AppConfig;
+import com.datastax.driver.core.utils.UUIDs;
+import com.skaas.core.CassandraConnector;
+
 
 /**
  * Servlet implementation class Signupservlet
@@ -37,16 +41,13 @@ public class Signupservlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String user_id = AppConfig.getUserId(request.getCookies());
 		if(user_id != null){  
-	    	String query1 = "DELETE FROM contacts WHERE `user_id`=" + user_id + ";";
-	    	String query2 = "DELETE FROM users WHERE `id`=" + user_id + ";";
-			try {
-				MySQLConnector mysql = new MySQLConnector();
-				mysql.execute(query1);
-				mysql.execute(query2);
-				mysql.close();
-			} catch (ClassNotFoundException | SQLException e) {
-				e.printStackTrace();
-			}
+			String query1 = "DELETE FROM contacts WHERE user_id=" + user_id + ";";
+	    	String query2 = "DELETE FROM users WHERE id=" + user_id + ";";
+
+	    	CassandraConnector cassandra = new CassandraConnector();
+	        cassandra.execute(query1);
+	        cassandra.execute(query2);
+	        cassandra.close();
 
 			ContainerURL containerURL;
 			try {
@@ -81,16 +82,11 @@ public class Signupservlet extends HttpServlet {
 				password = request.getParameter("password");
 		
 		if (name != null && email != null && password != null) {
-			String query = "INSERT INTO users (`name`, `email`, `password`) VALUES ('" + name + "', '" + email + "', '" + password + "');";
-			try {
-				MySQLConnector mysql = new MySQLConnector();
-				mysql.execute(query);
-				mysql.close();
-				response.sendRedirect("login.jsp");
-			} catch (ClassNotFoundException | SQLException e) {
-				e.printStackTrace();
-				out.println("User may already exist. Please try again with different email ID");
-			}
+			String query = "INSERT INTO users (id, name, email, password) VALUES ( " + UUIDs.timeBased() + ", '" + name + "', '" + email + "', '" + password + "');";
+
+			CassandraConnector cassandra = new CassandraConnector();
+	        cassandra.execute(query);
+	        cassandra.close();
 		} else {
 			out.println("The parameters 'name', 'email' and/or 'password' is not found in the request");
 		}

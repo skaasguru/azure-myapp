@@ -2,9 +2,9 @@ package com.skaas.webapp;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -13,7 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.skaas.core.AppConfig;
-import com.skaas.core.MySQLConnector;
+import com.datastax.driver.core.Row;
+import com.skaas.core.CassandraConnector;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -57,26 +58,19 @@ public class Loginservlet extends HttpServlet {
 		
         String email = request.getParameter("email");  
         String password = request.getParameter("password");
-        String actualPassword = null;
-        String user_id = null;
 
-        String query = "SELECT * FROM users WHERE `email`='" + email + "'";
-        try {
-			MySQLConnector mysql = new MySQLConnector();
-			ResultSet resultset = mysql.executeQuery(query);
-			if (resultset.next()){
-				user_id = resultset.getString(1);
-				actualPassword = resultset.getString(4);
-			} else {
-				out.print("<h1>User Not Found!</h1>");
-				out.close();
-			}			
-		} catch (ClassNotFoundException | SQLException e) {
-			out.print("<h1>DB Error!</h1>");
-			out.print(e.getMessage());
+        String query = "SELECT * FROM users WHERE email = '" + email + "' LIMIT 1;";
+        CassandraConnector cassandra = new CassandraConnector();
+        List<Row> queryResult = cassandra.execute(query).all();
+        if (queryResult.size() == 0 ) {
+			out.print("<h1>User Not Found!</h1>");
 			out.close();
-			e.printStackTrace();
-		}
+        }
+        Row user = queryResult.get(0);
+        cassandra.close();
+
+        String actualPassword = user.getString("password");
+        UUID user_id = user.getUUID("id");
 		System.out.println(email + " (" + password + " == " + actualPassword  + ") =" + password.equals(actualPassword));
         
         if (actualPassword != null) {

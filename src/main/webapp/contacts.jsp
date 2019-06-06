@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8" %>
-<%@ page import="java.sql.*,com.skaas.core.*" %>
+<%@ page import="java.sql.*,java.util.List,com.skaas.core.*,com.datastax.driver.core.Row" %>
 
 <%
 	String user_id = AppConfig.getUserId(request.getCookies());
@@ -58,23 +58,26 @@
 			</thead>
 			<tbody>
 				<%
-				   	MySQLConnector mysql =	new MySQLConnector();
-			   		ResultSet resultset = mysql.executeQuery("SELECT id,name,phone FROM contacts WHERE user_id="+user_id);
-				   	while(resultset.next()){
+					String query = "SELECT id, name, phone from contacts WHERE user_id=" + user_id;
+					
+					CassandraConnector cassandra = new CassandraConnector();
+					List<Row> contacts = cassandra.execute(query).all();
+	
+			        for (Row contact: contacts) {
 			   	%>
 				<tr>
-				    <td><%= resultset.getString(1) %></td>
-				    <td><%= resultset.getString(2) %></td>
-				    <td><%= resultset.getString(3) %></td>
+				    <td><%= contact.getUUID("id") %></td>
+				    <td><%= contact.getString("name") %></td>
+				    <td><%= contact.getString("phone") %></td>
 					<td>
-						<a href="contactservlet?delete=<%= resultset.getString(1) %>">
+						<a href="contactservlet?delete=<%= contact.getUUID("id") %>">
 							<span class="glyphicon glyphicon-trash"></span>
 						</a>
 					</td>
 				</tr>
 				<%
-					}
-				   	mysql.close(resultset);
+			        }
+			        cassandra.close();
 			   	%>				
 			</tbody>
 		</table>

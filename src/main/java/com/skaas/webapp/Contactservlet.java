@@ -2,7 +2,6 @@ package com.skaas.webapp;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -10,7 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.skaas.core.AppConfig;
-import com.skaas.core.MySQLConnector;
+import com.datastax.driver.core.utils.UUIDs;
+import com.skaas.core.CassandraConnector;
 
 /**
  * Handles Operations related to "My Contact"
@@ -35,15 +35,11 @@ public class Contactservlet extends HttpServlet {
 			
 			if (request.getParameter("delete") != null) {
 				
-				String query = "DELETE FROM contacts WHERE `user_id`=" + user_id + " AND `id`=" + request.getParameter("delete") + ";";
+				String query = "DELETE FROM contacts WHERE user_id=" + user_id + " AND id=" + request.getParameter("delete") + ";";
 
-				try {
-					MySQLConnector mysql = new MySQLConnector();
-					mysql.execute(query);
-					mysql.close();
-				} catch (ClassNotFoundException | SQLException e) {
-					e.printStackTrace();
-				}
+				CassandraConnector cassandra = new CassandraConnector();
+		        cassandra.execute(query);
+		        cassandra.close();
 
 				response.sendRedirect("contacts.jsp");	
 			} else {
@@ -62,14 +58,11 @@ public class Contactservlet extends HttpServlet {
 		String user_id = AppConfig.getUserId(request.getCookies()); 
 		if(user_id != null){ 
 			if (request.getParameter("name") != null && request.getParameter("phone") != null) {
-				String query = "INSERT INTO contacts (`user_id`, `name`, `phone`) VALUES ('"+user_id+"', '"+ request.getParameter("name") +"', '"+request.getParameter("phone")+"');";
-				try {
-					MySQLConnector mysql = new MySQLConnector();
-					mysql.execute(query);
-					mysql.close();
-				} catch (ClassNotFoundException | SQLException e) {
-					e.printStackTrace();
-				}
+				String query = "INSERT INTO contacts (id, user_id, name, phone) VALUES (" + UUIDs.timeBased() + ", " + user_id + ", '" + request.getParameter("name") + "', '" + request.getParameter("phone") + "');";
+				
+				CassandraConnector cassandra = new CassandraConnector();
+		        cassandra.execute(query);
+		        cassandra.close();
 				
 		        response.sendRedirect("contacts.jsp");
 			} else {
