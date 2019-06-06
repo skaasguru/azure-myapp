@@ -21,7 +21,7 @@ public class AppConfig {
 			accountName = (System.getenv("SA_NAME") != null) ? System.getenv("SA_NAME") : "YOUR_STORAGE_ACCOUNT_NAME",
 			accountKey = (System.getenv("SA_KEY") != null) ? System.getenv("SA_KEY") : "YOUR_STORAGE_ACCOUNT_KEY",
 			container = (System.getenv("SA_CONTAINER") != null) ? System.getenv("SA_CONTAINER") : "YOUR_STORAGE_ACCOUNT_CONTAINER";
-	public static final String authServiceEndpoint = "http://localhost:8080/authservice";
+	public static final String authServiceEndpoint = (System.getenv("AUTH_SERVICE") != null) ? System.getenv("AUTH_SERVICE") : "http://localhost:8080/authservice";
 	
 	
 	public static ContainerURL getContainerURL() throws InvalidKeyException, MalformedURLException {
