@@ -27,7 +27,7 @@ install_mysql(){
 
 pull_and_deploy_application(){
     git clone -b v3.0 https://github.com/skaasguru/azure-myapp.git
-    cd myapp
+    cd azure-myapp
     mysql -uroot -p$password < schema.sql
     mvn package
     cp ./target/webapp-1.0.0.war /var/lib/tomcat8/webapps/myapp.war
