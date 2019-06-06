@@ -10,8 +10,8 @@ create_swap(){
 
 install_java_and_tomcat(){
     apt-get update
-    apt install python-software-properties -y
-    apt-get install -y default-jdk tomcat8 maven unzip
+    apt install software-properties-common -y
+    apt-get install -y default-jdk tomcat8 maven
     echo JAVA_HOME=\"$(readlink -f /usr/bin/java | sed "s:/bin/java::")\" >> /etc/environment
     source /etc/environment
 }
@@ -26,7 +26,7 @@ install_mysql(){
 }
 
 pull_and_deploy_application(){
-    git clone -b monolith2a https://github.com/skaasguru/myapp.git
+    git clone -b v2.0 https://github.com/skaasguru/azure-myapp.git
     cd myapp
     mysql -uroot -p$password < schema.sql
     mvn package
